@@ -1,0 +1,477 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    background-color: #F4F5F6;
+}
+
+a {
+    text-decoration: none;
+    color: #000000;
+}
+
+button {
+    font-family: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    color: inherit;
+}
+
+input {
+    font-family: "Montserrat", sans-serif;
+}
+
+h1, h2, h3 {
+    font-weight: 700;
+}
+
+.container {
+    padding-left: calc(50% - 600px);
+    padding-right: calc(50% - 600px);
+}
+
+.btn {
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #7334EA;
+    border-radius: 6px;
+    padding: 12px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.btn:disabled {
+    background-color: #999999;
+    cursor: not-allowed;
+}
+
+.header {
+    background-color: #FFFFFF;
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__nav {
+    display: flex;
+    gap: 48px;
+}
+
+.header__link {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 170%;
+}
+
+.header__link_active {
+    font-weight: 600;
+    color: #7334EA;
+    border-bottom: 1px solid #7334EA;
+}
+
+.header__btn {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 170%;
+}
+
+.main {
+    margin-top: 36px;
+    margin-bottom: 72px;
+    height: 100%;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 32px;
+    align-items: center;
+}
+
+.content_auth {
+    position: relative;
+    min-height: calc(100vh - 64px - 108px);
+}
+
+.content__nav-panel {
+    grid-column: span 12;
+}
+
+.line {
+    border-bottom: 0.5px solid #999999;
+    margin: 0 -32px;
+}
+
+.window {
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    padding: 32px;
+    box-shadow: 0px 20px 67px -12px rgba(0, 0, 0, 0.13);
+    border-radius: 30px;
+    box-sizing: border-box;
+}
+
+.window_auth {
+    align-items: center;
+    position: absolute;
+    width: 380px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+.window_big {
+    height: 100%;
+    grid-column: span 8;
+}
+
+.window_small {
+    grid-column: span 4;
+}
+
+.window__title {
+    font-size: 24px;
+    margin-bottom: 24px;
+}
+
+.window__input {
+    border: 0.5px solid #999999;
+    border-radius: 6px;
+    padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.window__input:focus {
+    outline:none;
+    background: #F1EBFD;
+    border: 0.5px solid #7334EA;
+}
+
+.window__input_error {
+    background: #FFEBEB;
+    border: 0.5px solid #F25050;
+}
+
+.window__input-field {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    border: 0.5px solid #999999;
+    border-radius: 6px;
+    padding: 0 12px;
+    margin-bottom: 12px;
+    background: #FFFFFF;
+}
+
+.window__input-field_error {
+    background: #FFEBEB;
+    border: 0.5px solid #F25050;
+}
+
+.window__input-field:focus-within:not(.window__input-field_error) {
+    background: #F1EBFD;
+    border: 0.5px solid #7334EA;
+}
+
+.window__input-field__control {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    padding: 12px 0;
+    background: transparent;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+}
+
+.window__input-field__control--error-sized {
+    flex: 0 1 auto;
+    width: var(--auth-ch, 12ch);
+    min-width: 8ch;
+    max-width: calc(100% - 1.25em);
+}
+
+.window__input-field__control:focus {
+    outline: none;
+}
+
+.window__input-field__star {
+    color: #F25050;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.window__input_auth {
+    margin-bottom: 12px;
+}
+
+.auth-form{
+    width: 100%;
+}
+
+.auth-form__error {
+    width: 100%;
+    color: #F84D4D;
+    line-height: 150%;
+    text-align: center;
+    margin-top: 0;
+}
+
+.window__btn.auth-form__submit {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.window__btn.auth-form__submit.auth-form__submit_after-error {
+    margin-top: 24px;
+}
+
+.window__text {
+    color: #999999;
+    line-height: 150%;
+}
+
+.window__link {
+    color: #999999;
+    line-height: 150%;
+    margin-top: 4px;
+    border-bottom: 1px solid #999999;
+}
+
+.window__form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form__title {
+    margin-bottom: 16px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.form__title-asterisk {
+    color: #F25050;
+    font-weight: 600;
+}
+
+.category {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.category__item {
+    display: flex;
+    padding: 8px 20px;
+    gap: 12px;
+    background: #F4F5F6;
+    border-radius: 30px;
+    width: fit-content;
+}
+
+.category__item_selected {
+    outline: 0.5px solid #7334EA;
+    outline-offset: 0;
+}
+
+.table__line {
+    margin-bottom: 18px;
+}
+
+.table__row {
+    display: grid;
+    grid-template-columns: 141px 141px 142px 158px 12px;
+    gap: 32px;
+    margin-bottom: 14px;
+}
+
+.table__row_header {
+    margin-bottom: 6px;
+}
+
+.table__cell_header {
+    color: #999999;
+}
+
+.calendar {
+    height: 540px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding: 32px 32px 0 32px;
+}
+
+.calendar__week-fixed {
+    flex-shrink: 0;
+}
+
+.calendar__line-under-week {
+    margin-top: 0;
+}
+
+.calendar__scroll-body {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    width: calc(100% + 32px);
+    margin-right: -32px;
+    padding-right: 0;
+}
+
+@supports (-moz-appearance: none) {
+    .calendar__scroll-body {
+        scrollbar-width: thin;
+        scrollbar-color: #D9D9D9 transparent;
+    }
+}
+
+.calendar__scroll-inner {
+    padding-top: 24px;
+    padding-right: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.calendar__scroll-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.calendar__scroll-body::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+.calendar__scroll-body::-webkit-scrollbar-button:vertical:start:decrement,
+.calendar__scroll-body::-webkit-scrollbar-button:vertical:start:increment,
+.calendar__scroll-body::-webkit-scrollbar-button:vertical:end:decrement,
+.calendar__scroll-body::-webkit-scrollbar-button:vertical:end:increment {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+.calendar__scroll-body::-webkit-scrollbar-thumb {
+    background: #D9D9D9;
+    border-radius: 30px;
+    height: 100px;
+    min-height: 100px;
+}
+
+.calendar__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.calendar__item {
+    width: 40px;
+}
+
+.week__day {
+    margin-bottom: 7px;
+    color: #999999;
+}
+
+.month__name {
+    margin-bottom: 12px;
+}
+
+.month__day {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #F4F5F6;
+    border-radius: 60px;
+}
+
+button.month__day {
+    width: 40px;
+    max-width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0;
+}
+
+/* Выше специфичность, чем у `button { color: inherit }` и `button.month__day` */
+button.month__day.month__day_selected {
+    background-color: #F1EBFD;
+    color: #7334EA;
+}
+
+.period {
+    color: #999999;
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.period__date {
+    font-weight: 600;
+}
+
+.plan {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 32px;
+    height: 100%;
+}
+
+.plan__indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: end;
+    gap: 12px;
+}
+
+.chart {
+    width: 100%;
+    min-height: 4px;
+    border-radius: 12px;
+}
+
+.chart_food {
+    background: #D9B6FF;
+}
+.chart_transportation {
+    background: #FFB53D;
+}
+.chart_housing {
+    background: #6EE4FE;
+}
+.chart_entertainment {
+    background: #B0AEFF;
+}
+.chart_education {
+    background: #BCEC30;
+}
+.chart_other {
+    background: #FFB9B8;
+}
