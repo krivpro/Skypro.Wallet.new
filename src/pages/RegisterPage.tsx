@@ -19,6 +19,7 @@ export function RegisterPage() {
   const [emailError, setEmailError] = useState(false)
   const [passwordError, setPasswordError] = useState(false)
   const [showFormError, setShowFormError] = useState(false)
+  const [formErrorMessage, setFormErrorMessage] = useState(AUTH_FORM_ERROR_MESSAGE)
   const [submitting, setSubmitting] = useState(false)
 
   const isValid =
@@ -40,6 +41,7 @@ export function RegisterPage() {
       setNameError(badName)
       setEmailError(badEmail)
       setPasswordError(badPassword)
+      setFormErrorMessage(AUTH_FORM_ERROR_MESSAGE)
       setShowFormError(true)
       return
     }
@@ -59,8 +61,10 @@ export function RegisterPage() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 400) {
         setEmailError(true)
+        setFormErrorMessage(err.message)
         setShowFormError(true)
       } else {
+        setFormErrorMessage(err instanceof ApiError ? err.message : AUTH_FORM_ERROR_MESSAGE)
         setShowFormError(true)
       }
     } finally {
@@ -148,7 +152,7 @@ export function RegisterPage() {
               </>
             ) : null}
           </div>
-          {showFormError ? <p className="auth-form__error">{AUTH_FORM_ERROR_MESSAGE}</p> : null}
+          {showFormError ? <p className="auth-form__error">{formErrorMessage}</p> : null}
           <button
             type="submit"
             className={`window__btn btn auth-form__submit${showFormError ? ' auth-form__submit_after-error' : ''}`}
