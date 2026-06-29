@@ -1,20 +1,18 @@
 import { useState } from 'react'
 import { DEFAULT_WEEK_DAY_LABELS } from '../model/constants'
 
+export type CalendarDaySelection = { monthTitle: string; day: number }
+
 export type PeriodCalendarMonth = {
   monthTitle: string
   monthDays: readonly number[]
 }
 
-type DaySelection = { monthTitle: string; day: number }
-
 type PeriodCalendarProps = {
   months: readonly PeriodCalendarMonth[]
   weekDayLabels?: readonly string[]
-  /** Выбранный день при открытии (в указанном месяце из списка) */
-  initialSelection?: DaySelection | null
-  /** Вызывается при смене выбранного дня */
-  onSelectedDayChange?: (selection: DaySelection) => void
+  initialSelection?: CalendarDaySelection | null
+  onSelectedDayChange?: (selection: CalendarDaySelection) => void
 }
 
 export function PeriodCalendar({
@@ -23,17 +21,17 @@ export function PeriodCalendar({
   initialSelection,
   onSelectedDayChange,
 }: PeriodCalendarProps) {
-  const defaultSelection: DaySelection | null =
+  const defaultSelection: CalendarDaySelection | null =
     months[0] != null
       ? { monthTitle: months[0].monthTitle, day: 10 }
       : null
 
-  const [selected, setSelected] = useState<DaySelection | null>(
+  const [selected, setSelected] = useState<CalendarDaySelection | null>(
     initialSelection ?? defaultSelection,
   )
 
   const selectDay = (monthTitle: string, day: number) => {
-    const next = { monthTitle, day }
+    const next: CalendarDaySelection = { monthTitle, day }
     setSelected(next)
     onSelectedDayChange?.(next)
   }

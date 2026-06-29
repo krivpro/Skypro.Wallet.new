@@ -1,12 +1,16 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { clearToken } from '../shared/auth/tokenStorage'
+import { Link, NavLink } from 'react-router-dom'
+import { useLogout } from '../shared/auth/useLogout'
 
 type HeaderProps = {
   variant: 'auth' | 'app'
 }
 
+function navLinkClass(isActive: boolean): string {
+  return `header__link${isActive ? ' header__link_active' : ''}`
+}
+
 export function Header({ variant }: HeaderProps) {
-  const navigate = useNavigate()
+  const logout = useLogout()
 
   const logoTo = variant === 'app' ? '/expenses' : '/'
 
@@ -18,31 +22,14 @@ export function Header({ variant }: HeaderProps) {
       {variant === 'app' && (
         <>
           <nav className="header__nav">
-            <NavLink
-              to="/expenses"
-              className={({ isActive }) =>
-                `header__link${isActive ? ' header__link_active' : ''}`
-              }
-            >
+            <NavLink to="/expenses" className={({ isActive }) => navLinkClass(isActive)}>
               Мои расходы
             </NavLink>
-            <NavLink
-              to="/analysis"
-              className={({ isActive }) =>
-                `header__link${isActive ? ' header__link_active' : ''}`
-              }
-            >
+            <NavLink to="/analysis" className={({ isActive }) => navLinkClass(isActive)}>
               Анализ расходов
             </NavLink>
           </nav>
-          <button
-            type="button"
-            className="header__btn"
-            onClick={() => {
-              clearToken()
-              navigate('/')
-            }}
-          >
+          <button type="button" className="header__btn" onClick={logout}>
             Выйти
           </button>
         </>

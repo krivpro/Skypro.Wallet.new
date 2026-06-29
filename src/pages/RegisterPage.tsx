@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { registerUser } from '../shared/api/authApi'
 import { ApiError } from '../shared/api/client'
-import { authErrorFieldCh } from '../shared/auth/authFieldCh'
+import { isBadRequest } from '../shared/api/unauthorized'
 import { setToken } from '../shared/auth/tokenStorage'
+import { AuthInput } from '../shared/ui/AuthInput'
 import { AUTH_FORM_ERROR_MESSAGE, isValidEmail } from '../shared/validation/messages'
 
-const PH_NAME = 'Имя'
-const PH_EMAIL = 'Эл. почта'
-const PH_PASSWORD = 'Пароль'
+const MIN_NAME_LENGTH = 2
+const MIN_PASSWORD_LENGTH = 6
 
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -22,8 +22,10 @@ export function RegisterPage() {
   const [formErrorMessage, setFormErrorMessage] = useState(AUTH_FORM_ERROR_MESSAGE)
   const [submitting, setSubmitting] = useState(false)
 
-  const isValid =
-    name.trim().length >= 2 && isValidEmail(email) && password.trim().length >= 6
+  const isFormValid =
+    name.trim().length >= MIN_NAME_LENGTH &&
+    isValidEmail(email) &&
+    password.trim().length >= MIN_PASSWORD_LENGTH
 
   const clearFieldError = (field: 'name' | 'email' | 'password') => {
     setShowFormError(false)
@@ -32,19 +34,21 @@ export function RegisterPage() {
     else setPasswordError(false)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const badName = name.trim().length < 2
-    const badEmail = !isValidEmail(email)
-    const badPassword = password.trim().length < 6
-    if (badName || badEmail || badPassword) {
-      setNameError(badName)
-      setEmailError(badEmail)
-      setPasswordError(badPassword)
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+
+    const hasNameError = name.trim().length < MIN_NAME_LENGTH
+    const hasEmailError = !isValidEmail(email)
+    const hasPasswordError = password.trim().length < MIN_PASSWORD_LENGTH
+    if (hasNameError || hasEmailError || hasPasswordError) {
+      setNameError(hasNameError)
+      setEmailError(hasEmailError)
+      setPasswordError(hasPasswordError)
       setFormErrorMessage(AUTH_FORM_ERROR_MESSAGE)
       setShowFormError(true)
       return
     }
+
     setSubmitting(true)
     try {
       const user = await registerUser({
@@ -58,15 +62,14 @@ export function RegisterPage() {
       setPasswordError(false)
       setShowFormError(false)
       navigate('/expenses')
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 400) {
+    } catch (error) {
+      if (isBadRequest(error)) {
         setEmailError(true)
-        setFormErrorMessage(err.message)
-        setShowFormError(true)
+        setFormErrorMessage(error.message)
       } else {
-        setFormErrorMessage(err instanceof ApiError ? err.message : AUTH_FORM_ERROR_MESSAGE)
-        setShowFormError(true)
+        setFormErrorMessage(error instanceof ApiError ? error.message : AUTH_FORM_ERROR_MESSAGE)
       }
+      setShowFormError(true)
     } finally {
       setSubmitting(false)
     }
@@ -77,86 +80,41 @@ export function RegisterPage() {
       <div className="window window_auth">
         <h2 className="title window__title">Регистрация</h2>
         <form className="auth-form" onSubmit={handleSubmit}>
-          <div className={`window__input-field${nameError ? ' window__input-field_error' : ''}`}>
-            <input
-              type="text"
-              className={`window__input-field__control${nameError ? ' window__input-field__control--error-sized' : ''}`}
-              style={
-                nameError
-                  ? ({ ['--auth-ch' as string]: authErrorFieldCh(name, `${PH_NAME} *`) } as React.CSSProperties)
-                  : undefined
-              }
-              placeholder={nameError ? `${PH_NAME} *` : PH_NAME}
-              value={name}
-              onChange={(ev) => {
-                setName(ev.target.value)
-                clearFieldError('name')
-              }}
-            />
-            {nameError && name ? (
-              <>
-                {' '}
-                <span className="window__input-field__star">*</span>
-              </>
-            ) : null}
-          </div>
-          <div
-            className={`window__input-field${emailError ? ' window__input-field_error' : ''}`}
-          >
-            <input
-              type="text"
-              className={`window__input-field__control${emailError ? ' window__input-field__control--error-sized' : ''}`}
-              style={
-                emailError
-                  ? ({ ['--auth-ch' as string]: authErrorFieldCh(email, `${PH_EMAIL} *`) } as React.CSSProperties)
-                  : undefined
-              }
-              placeholder={emailError ? `${PH_EMAIL} *` : PH_EMAIL}
-              value={email}
-              onChange={(ev) => {
-                setEmail(ev.target.value)
-                clearFieldError('email')
-              }}
-            />
-            {emailError && email ? (
-              <>
-                {' '}
-                <span className="window__input-field__star">*</span>
-              </>
-            ) : null}
-          </div>
-          <div
-            className={`window__input-field${passwordError ? ' window__input-field_error' : ''}`}
-          >
-            <input
-              type="password"
-              className={`window__input-field__control${passwordError ? ' window__input-field__control--error-sized' : ''}`}
-              style={
-                passwordError
-                  ? ({
-                      ['--auth-ch' as string]: authErrorFieldCh(password, `${PH_PASSWORD} *`),
-                    } as React.CSSProperties)
-                  : undefined
-              }
-              placeholder={passwordError ? `${PH_PASSWORD} *` : PH_PASSWORD}
-              value={password}
-              onChange={(ev) => {
-                setPassword(ev.target.value)
-                clearFieldError('password')
-              }}
-            />
-            {passwordError && password ? (
-              <>
-                {' '}
-                <span className="window__input-field__star">*</span>
-              </>
-            ) : null}
-          </div>
+          <AuthInput
+            type="text"
+            label="Имя"
+            value={name}
+            hasError={nameError}
+            onChange={(value) => {
+              setName(value)
+              clearFieldError('name')
+            }}
+          />
+          <AuthInput
+            type="text"
+            label="Эл. почта"
+            value={email}
+            hasError={emailError}
+            onChange={(value) => {
+              setEmail(value)
+              clearFieldError('email')
+            }}
+          />
+          <AuthInput
+            type="password"
+            label="Пароль"
+            value={password}
+            hasError={passwordError}
+            onChange={(value) => {
+              setPassword(value)
+              clearFieldError('password')
+            }}
+          />
           {showFormError ? <p className="auth-form__error">{formErrorMessage}</p> : null}
           <button
             type="submit"
             className={`window__btn btn auth-form__submit${showFormError ? ' auth-form__submit_after-error' : ''}`}
-            disabled={(showFormError && !isValid) || submitting}
+            disabled={(showFormError && !isFormValid) || submitting}
           >
             {submitting ? 'Регистрация…' : 'Зарегистрироваться'}
           </button>

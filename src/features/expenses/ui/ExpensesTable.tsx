@@ -3,10 +3,11 @@ import type { ExpenseTableRow } from '../model/types'
 
 type ExpensesTableProps = {
   rows: ExpenseTableRow[]
-  onDeleteRow?: (id: string) => void
+  deletingId?: string | null
+  onDeleteRow: (id: string) => void
 }
 
-export function ExpensesTable({ rows, onDeleteRow }: ExpensesTableProps) {
+export function ExpensesTable({ rows, deletingId, onDeleteRow }: ExpensesTableProps) {
   return (
     <div className="window__table table">
       <div className="table__row table__row_header">
@@ -27,7 +28,8 @@ export function ExpensesTable({ rows, onDeleteRow }: ExpensesTableProps) {
             type="button"
             className="table__cellr"
             aria-label="Удалить расход"
-            onClick={() => onDeleteRow?.(row.id)}
+            disabled={deletingId === row.id}
+            onClick={() => onDeleteRow(row.id)}
           >
             <DeleteExpenseIcon />
           </button>

@@ -1,16 +1,12 @@
 import type { AnalysisPlanBar } from '../model/types'
 
 type SpendingCategoryBarsProps = {
-  /** Заголовок окна: итоговая сумма, как в макете «9 581 ₽» */
   totalTitle: string
   periodDescription: string
   periodDateLabel: string
   bars: AnalysisPlanBar[]
 }
 
-/**
- * Нижнее большое окно анализа: сумма, подпись периода и полоски по категориям (классы plan / chart_* из макета).
- */
 export function SpendingCategoryBars({
   totalTitle,
   periodDescription,

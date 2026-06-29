@@ -21,9 +21,17 @@ export function isValidExpenseDescription(value: string): boolean {
   return value.trim().length >= 4
 }
 
+export function normalizeExpenseAmount(value: string): string {
+  return value.trim().replace(/\s/g, '').replace(',', '.')
+}
+
+export function parseExpenseAmount(value: string): number {
+  return Number(normalizeExpenseAmount(value))
+}
+
 export function isValidExpenseAmount(value: string): boolean {
-  const normalized = value.trim().replace(/\s/g, '').replace(',', '.')
+  const normalized = normalizeExpenseAmount(value)
   if (!normalized) return false
-  const n = Number(normalized)
-  return Number.isFinite(n) && n > 0
+  const amount = Number(normalized)
+  return Number.isFinite(amount) && amount > 0
 }
