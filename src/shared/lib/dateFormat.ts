@@ -28,6 +28,14 @@ const MONTH_NAMES_GENITIVE = [
   'декабря',
 ] as const
 
+/** Ввод даты: только цифры, маска DD.MM.YYYY */
+export function formatExpenseDateInput(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`
+  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
+}
+
 /** DD.MM.YYYY → M-D-YYYY для API */
 export function uiDateToApiDate(value: string): string {
   const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value.trim())
