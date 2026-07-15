@@ -4,6 +4,8 @@ type ExpenseTextFieldProps = {
   value: string
   hasError: boolean
   onChange: (value: string) => void
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
+  maxLength?: number
 }
 
 export function ExpenseTextField({
@@ -12,6 +14,8 @@ export function ExpenseTextField({
   value,
   hasError,
   onChange,
+  inputMode,
+  maxLength,
 }: ExpenseTextFieldProps) {
   return (
     <div className="form__item">
@@ -24,6 +28,8 @@ export function ExpenseTextField({
         className={`window__input${hasError ? ' window__input_error' : ''}`}
         placeholder={placeholder}
         value={value}
+        inputMode={inputMode}
+        maxLength={maxLength}
         onChange={(event) => onChange(event.target.value)}
       />
     </div>

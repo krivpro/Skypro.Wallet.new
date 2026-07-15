@@ -8,8 +8,9 @@ import { ExpenseCategoryPicker } from '../features/expenses/ui/ExpenseCategoryPi
 import { ExpenseTextField } from '../features/expenses/ui/ExpenseTextField'
 import { ExpensesTable } from '../features/expenses/ui/ExpensesTable'
 import { isBadRequest, redirectIfUnauthorized } from '../shared/api/unauthorized'
-import { uiDateToApiDate } from '../shared/lib/dateFormat'
+import { formatExpenseDateInput, uiDateToApiDate } from '../shared/lib/dateFormat'
 import {
+  formatExpenseAmountInput,
   isValidExpenseAmount,
   isValidExpenseDate,
   isValidExpenseDescription,
@@ -139,11 +140,13 @@ export function ExpensesPage() {
           </div>
           <ExpenseTextField
             title="Дата"
-            placeholder="Введите дату"
+            placeholder="ДД.ММ.ГГГГ"
             value={date}
             hasError={fieldErrors.date}
+            inputMode="numeric"
+            maxLength={10}
             onChange={(value) => {
-              setDate(value)
+              setDate(formatExpenseDateInput(value))
               clearFieldError('date')
             }}
           />
@@ -152,8 +155,9 @@ export function ExpensesPage() {
             placeholder="Введите сумму"
             value={amount}
             hasError={fieldErrors.amount}
+            inputMode="decimal"
             onChange={(value) => {
-              setAmount(value)
+              setAmount(formatExpenseAmountInput(value))
               clearFieldError('amount')
             }}
           />
