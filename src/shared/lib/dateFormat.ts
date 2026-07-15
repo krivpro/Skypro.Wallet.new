@@ -51,6 +51,22 @@ export function formatPeriodDayLabel(year: number, month: number, day: number): 
   return `${day} ${MONTH_NAMES_GENITIVE[month - 1]} ${year}`
 }
 
+export function formatPeriodRangeLabel(
+  start: { year: number; month: number; day: number },
+  end: { year: number; month: number; day: number },
+): string {
+  const startLabel = formatPeriodDayLabel(start.year, start.month, start.day)
+  if (start.year === end.year && start.month === end.month && start.day === end.day) {
+    return startLabel
+  }
+  return `${startLabel} – ${formatPeriodDayLabel(end.year, end.month, end.day)}`
+}
+
+/** YYYYMMDD для сравнения дней календаря */
+export function calendarDaySortValue(year: number, month: number, day: number): number {
+  return year * 10000 + month * 100 + day
+}
+
 export function buildMonthTitle(year: number, month: number): string {
   return `${MONTH_NAMES[month - 1]} ${year}`
 }

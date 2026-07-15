@@ -425,6 +425,11 @@ button.month__day.month__day_selected {
     color: #7334EA;
 }
 
+button.month__day.month__day_in-range {
+    background-color: #F8F5FE;
+    color: #7334EA;
+}
+
 .period {
     color: #999999;
     display: flex;
