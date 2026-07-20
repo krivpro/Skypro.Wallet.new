@@ -28,6 +28,14 @@ const MONTH_NAMES_GENITIVE = [
   'декабря',
 ] as const
 
+/** Ввод даты: только цифры, маска DD.MM.YYYY */
+export function formatExpenseDateInput(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`
+  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
+}
+
 /** DD.MM.YYYY → M-D-YYYY для API */
 export function uiDateToApiDate(value: string): string {
   const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value.trim())
@@ -49,6 +57,22 @@ export function formatDisplayDate(iso: string | Date): string {
 
 export function formatPeriodDayLabel(year: number, month: number, day: number): string {
   return `${day} ${MONTH_NAMES_GENITIVE[month - 1]} ${year}`
+}
+
+export function formatPeriodRangeLabel(
+  start: { year: number; month: number; day: number },
+  end: { year: number; month: number; day: number },
+): string {
+  const startLabel = formatPeriodDayLabel(start.year, start.month, start.day)
+  if (start.year === end.year && start.month === end.month && start.day === end.day) {
+    return startLabel
+  }
+  return `${startLabel} – ${formatPeriodDayLabel(end.year, end.month, end.day)}`
+}
+
+/** YYYYMMDD для сравнения дней календаря */
+export function calendarDaySortValue(year: number, month: number, day: number): number {
+  return year * 10000 + month * 100 + day
 }
 
 export function buildMonthTitle(year: number, month: number): string {

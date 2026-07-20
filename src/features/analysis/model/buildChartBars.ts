@@ -1,5 +1,6 @@
 import type { ApiTransaction } from '../../../shared/api/types'
 import {
+  CATEGORY_API_BY_LABEL,
   CATEGORY_LABEL_BY_API,
   CHART_CLASS_BY_API,
 } from '../../expenses/model/categoryMap'
@@ -22,8 +23,8 @@ export function buildChartBarsFromTransactions(
 
   return EXPENSE_CATEGORY_OPTIONS.map(({ label }) => {
     const sum = sums.get(label) ?? 0
-    const apiKey = Object.entries(CATEGORY_LABEL_BY_API).find(([, l]) => l === label)?.[0]
-    const chartClass = apiKey ? CHART_CLASS_BY_API[apiKey as keyof typeof CHART_CLASS_BY_API] : 'chart_other'
+    const apiKey = CATEGORY_API_BY_LABEL[label]
+    const chartClass = apiKey ? CHART_CLASS_BY_API[apiKey] : 'chart_other'
     const heightPercent = maxSum > 0 ? (sum / maxSum) * 100 : 0
     const heightPx = maxSum > 0 ? Math.max(4, (sum / maxSum) * CHART_MAX_HEIGHT_PX) : 4
 

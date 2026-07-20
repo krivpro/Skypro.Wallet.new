@@ -5,56 +5,79 @@ import {
   sumTransactions,
 } from '../features/analysis/model/buildChartBars'
 import type { AnalysisPlanBar } from '../features/analysis/model/types'
-import { PeriodCalendar } from '../features/analysis/ui/PeriodCalendar'
-import type { PeriodCalendarMonth } from '../features/analysis/ui/PeriodCalendar'
+import {
+  PeriodCalendar,
+  type CalendarDaySelection,
+  type CalendarPeriodSelection,
+  type PeriodCalendarMonth,
+} from '../features/analysis/ui/PeriodCalendar'
 import { SpendingCategoryBars } from '../features/analysis/ui/SpendingCategoryBars'
 import { formatRubles } from '../features/expenses/model/transactionMappers'
-import { ApiError } from '../shared/api/client'
 import type { ApiTransaction } from '../shared/api/types'
 import { fetchTransactionsByPeriod } from '../shared/api/transactionsApi'
+import { redirectIfUnauthorized } from '../shared/api/unauthorized'
 import {
   buildRecentCalendarMonths,
   calendarDayToApiDate,
-  formatPeriodDayLabel,
+  formatPeriodRangeLabel,
   parseMonthTitle,
-  type CalendarMonthData,
 } from '../shared/lib/dateFormat'
 
-type DaySelection = { monthTitle: string; day: number }
+const CALENDAR_MONTHS_COUNT = 6
 
-function toCalendarMonths(data: CalendarMonthData[]): PeriodCalendarMonth[] {
-  return data.map(({ monthTitle, monthDays }) => ({ monthTitle, monthDays }))
+function toPeriodCalendarMonths(
+  months: ReturnType<typeof buildRecentCalendarMonths>,
+): PeriodCalendarMonth[] {
+  return months.map(({ monthTitle, monthDays }) => ({ monthTitle, monthDays }))
+}
+
+function buildDefaultPeriod(
+  months: ReturnType<typeof buildRecentCalendarMonths>,
+): CalendarPeriodSelection | null {
+  const currentMonth = months[months.length - 1]
+  if (!currentMonth) return null
+
+  const today = new Date()
+  const day: CalendarDaySelection = {
+    monthTitle: currentMonth.monthTitle,
+    day: Math.min(today.getDate(), currentMonth.monthDays.length),
+  }
+  return { start: day, end: day }
+}
+
+function selectionToApiDate(selection: CalendarDaySelection): string | null {
+  const parsed = parseMonthTitle(selection.monthTitle)
+  if (!parsed) return null
+  return calendarDayToApiDate(parsed.year, parsed.month, selection.day)
 }
 
 export function AnalysisPage() {
   const navigate = useNavigate()
-  const calendarSource = useMemo(() => buildRecentCalendarMonths(6), [])
-  const calendarMonths = useMemo(() => toCalendarMonths(calendarSource), [calendarSource])
+  const calendarSource = useMemo(
+    () => buildRecentCalendarMonths(CALENDAR_MONTHS_COUNT),
+    [],
+  )
+  const calendarMonths = useMemo(() => toPeriodCalendarMonths(calendarSource), [calendarSource])
+  const defaultPeriod = useMemo(() => buildDefaultPeriod(calendarSource), [calendarSource])
 
-  const defaultMonth = calendarSource[calendarSource.length - 1]
-  const defaultDay = Math.min(10, defaultMonth?.monthDays.length ?? 1)
-  const defaultSelection: DaySelection | null = defaultMonth
-    ? { monthTitle: defaultMonth.monthTitle, day: defaultDay }
-    : null
-
-  const [selected, setSelected] = useState<DaySelection | null>(defaultSelection)
+  const [selectedPeriod, setSelectedPeriod] = useState<CalendarPeriodSelection | null>(
+    defaultPeriod,
+  )
   const [transactions, setTransactions] = useState<ApiTransaction[]>([])
   const [loading, setLoading] = useState(false)
 
-  const loadDayTransactions = useCallback(
-    async (selection: DaySelection) => {
-      const parsed = parseMonthTitle(selection.monthTitle)
-      if (!parsed) return
+  const loadPeriodTransactions = useCallback(
+    async (period: CalendarPeriodSelection) => {
+      const start = selectionToApiDate(period.start)
+      const end = selectionToApiDate(period.end)
+      if (!start || !end) return
 
-      const apiDate = calendarDayToApiDate(parsed.year, parsed.month, selection.day)
       setLoading(true)
       try {
-        const data = await fetchTransactionsByPeriod({ start: apiDate, end: apiDate })
+        const data = await fetchTransactionsByPeriod({ start, end })
         setTransactions(data)
-      } catch (err) {
-        if (err instanceof ApiError && err.status === 401) {
-          navigate('/')
-        } else {
+      } catch (error) {
+        if (!redirectIfUnauthorized(error, navigate)) {
           setTransactions([])
         }
       } finally {
@@ -65,21 +88,29 @@ export function AnalysisPage() {
   )
 
   useEffect(() => {
-    if (selected) void loadDayTransactions(selected)
-  }, [selected, loadDayTransactions])
+    if (!selectedPeriod) return
+    const timeoutId = window.setTimeout(() => {
+      void loadPeriodTransactions(selectedPeriod)
+    }, 0)
+    return () => window.clearTimeout(timeoutId)
+  }, [selectedPeriod, loadPeriodTransactions])
 
-  const bars: AnalysisPlanBar[] = useMemo(
+  const chartBars: AnalysisPlanBar[] = useMemo(
     () => buildChartBarsFromTransactions(transactions),
     [transactions],
   )
 
-  const total = sumTransactions(transactions)
+  const totalAmount = sumTransactions(transactions)
   const periodDateLabel = useMemo(() => {
-    if (!selected) return '—'
-    const parsed = parseMonthTitle(selected.monthTitle)
-    if (!parsed) return '—'
-    return formatPeriodDayLabel(parsed.year, parsed.month, selected.day)
-  }, [selected])
+    if (!selectedPeriod) return '—'
+    const start = parseMonthTitle(selectedPeriod.start.monthTitle)
+    const end = parseMonthTitle(selectedPeriod.end.monthTitle)
+    if (!start || !end) return '—'
+    return formatPeriodRangeLabel(
+      { year: start.year, month: start.month, day: selectedPeriod.start.day },
+      { year: end.year, month: end.month, day: selectedPeriod.end.day },
+    )
+  }, [selectedPeriod])
 
   return (
     <div className="content">
@@ -88,8 +119,8 @@ export function AnalysisPage() {
       </div>
       <PeriodCalendar
         months={calendarMonths}
-        initialSelection={defaultSelection}
-        onSelectedDayChange={setSelected}
+        initialPeriod={defaultPeriod}
+        onPeriodChange={setSelectedPeriod}
       />
       {loading ? (
         <div className="window window_big">
@@ -97,10 +128,10 @@ export function AnalysisPage() {
         </div>
       ) : (
         <SpendingCategoryBars
-          totalTitle={formatRubles(total)}
+          totalTitle={formatRubles(totalAmount)}
           periodDescription="Расходы за"
           periodDateLabel={periodDateLabel}
-          bars={bars}
+          bars={chartBars}
         />
       )}
     </div>
